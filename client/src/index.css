@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+}
+
+@layer base {
+  html { @apply h-full; }
+  body {
+    @apply min-h-full bg-slate-900 text-slate-100 font-sans antialiased;
+  }
+  #root { @apply min-h-screen block; }
+  input, button { @apply font-sans; }
+}

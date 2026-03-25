@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import AttendanceCalendarModal from './AttendanceCalendarModal';
 
 const shellClass =
-  'relative overflow-hidden rounded-3xl border border-slate-700/50 bg-gradient-to-b from-slate-800/90 via-slate-900/95 to-slate-950 shadow-2xl shadow-black/50 ring-1 ring-white/[0.06]';
+  'relative overflow-hidden rounded-3xl border border-slate-200/90 bg-gradient-to-b from-stone-50 via-slate-50 to-slate-100 shadow-xl shadow-slate-300/40 ring-1 ring-slate-200/70 dark:border-slate-700/50 dark:from-slate-800/90 dark:via-slate-900/95 dark:to-slate-950 dark:shadow-black/50 dark:ring-white/[0.06]';
 
 function formatClock(iso) {
   if (!iso) return '';
@@ -61,9 +62,9 @@ function timezoneLabel(iana) {
 
 function StatusBadge({ children, tone }) {
   const tones = {
-    idle: 'border-slate-600/80 bg-slate-800/80 text-slate-300',
-    live: 'border-emerald-500/30 bg-emerald-950/50 text-emerald-200',
-    done: 'border-slate-500/50 bg-slate-800/60 text-slate-200',
+    idle: 'border-slate-300/90 bg-slate-200/90 text-slate-800 dark:border-slate-600/80 dark:bg-slate-800/80 dark:text-slate-300',
+    live: 'border-emerald-400/50 bg-emerald-50 text-emerald-900 dark:border-emerald-500/30 dark:bg-emerald-950/50 dark:text-emerald-200',
+    done: 'border-slate-300/70 bg-slate-100/90 text-slate-800 dark:border-slate-500/50 dark:bg-slate-800/60 dark:text-slate-200',
   };
   return (
     <span
@@ -86,6 +87,7 @@ export default function EmployeeAttendance() {
   const [tick, setTick] = useState(0);
   const [testResetEnabled, setTestResetEnabled] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   const noEmployer = !user?.employerId;
 
@@ -233,10 +235,22 @@ export default function EmployeeAttendance() {
 
         <div className="relative border-b border-slate-700/50 bg-slate-900/30 px-6 py-5 sm:px-10 lg:px-12">
           <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
+            <div className="min-w-0">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Work date</p>
-              <p className="mt-2 text-lg font-semibold tracking-tight text-slate-50 sm:text-xl">{formatWorkDate(workDate)}</p>
-              <p className="mt-1 text-xs text-slate-500">Clock times follow your device; the work day follows company time.</p>
+              <button
+                type="button"
+                onClick={() => setCalendarOpen(true)}
+                title="View attendance calendar"
+                className="group mt-2 w-full max-w-xl rounded-xl border border-transparent px-2 py-1.5 text-left transition hover:border-slate-600/60 hover:bg-slate-800/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 sm:px-3"
+              >
+                <p className="text-lg font-semibold tracking-tight text-slate-50 group-hover:text-white sm:text-xl">
+                  {formatWorkDate(workDate)}
+                </p>
+                <p className="mt-1 text-xs text-slate-500 group-hover:text-slate-400">
+                  Clock times follow your device; the work day follows company time.{' '}
+                  <span className="text-emerald-400/90 underline decoration-emerald-500/40 underline-offset-2">Open calendar</span>
+                </p>
+              </button>
             </div>
             <div className="flex flex-wrap items-center justify-end gap-2">
               {!started && <StatusBadge tone="idle">Not started</StatusBadge>}
@@ -392,6 +406,13 @@ export default function EmployeeAttendance() {
           )}
         </div>
       </div>
+
+      <AttendanceCalendarModal
+        open={calendarOpen}
+        onClose={() => setCalendarOpen(false)}
+        workDate={workDate}
+        workTimezoneLabel={timezoneLabel(workTimezone)}
+      />
     </div>
   );
 }

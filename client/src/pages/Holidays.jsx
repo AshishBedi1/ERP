@@ -3,12 +3,6 @@ import axios from 'axios';
 import AppShell from '../components/AppShell';
 import { useAuth } from '../context/AuthContext';
 
-const cardClass =
-  'rounded-2xl border border-slate-700/80 bg-slate-800/50 shadow-lg shadow-black/20 backdrop-blur-sm';
-
-const inputClass =
-  'w-full rounded-xl border border-slate-600 bg-slate-950/80 px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/25';
-
 function toInputDate(iso) {
   const d = new Date(iso);
   const y = d.getFullYear();
@@ -148,11 +142,11 @@ export default function Holidays() {
   return (
     <AppShell>
       <div className="mx-auto max-w-3xl">
-        <header className="mb-8 flex flex-col gap-4 border-b border-slate-800 pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <header className="mb-8 flex flex-col gap-4 border-b border-slate-200 pb-6 dark:border-slate-800 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Company</p>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-100">Holidays</h1>
-            <p className="mt-1.5 text-sm text-slate-500">Public holidays for your organization.</p>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">Holidays</h1>
+            <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-500">Public holidays for your organization.</p>
           </div>
           {isEmployer && (
             <button
@@ -165,7 +159,7 @@ export default function Holidays() {
           )}
         </header>
 
-        <div className={`overflow-hidden ${cardClass}`}>
+        <div className="erp-card overflow-hidden">
           {loading ? (
             <div className="px-6 py-12 text-center text-sm text-slate-500">Loading…</div>
           ) : holidays.length === 0 ? (
@@ -173,22 +167,22 @@ export default function Holidays() {
               {isEmployer ? 'No holidays yet. Add your company’s public holidays.' : 'No holidays listed yet.'}
             </div>
           ) : (
-            <ul className="divide-y divide-slate-700/60">
+            <ul className="divide-y divide-slate-200 dark:divide-slate-700/60">
               {holidays.map((h) => (
                 <li
                   key={h._id}
                   className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-slate-100">{h.name}</p>
-                    <p className="text-sm text-slate-400">{formatDisplayDate(h.date)}</p>
+                    <p className="font-medium text-slate-900 dark:text-slate-100">{h.name}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">{formatDisplayDate(h.date)}</p>
                   </div>
                   {isEmployer && (
                     <div className="flex shrink-0 items-center gap-2">
                       <button
                         type="button"
                         onClick={() => openEdit(h)}
-                        className="rounded-lg border border-slate-600 bg-slate-800/80 px-3 py-1.5 text-xs font-medium text-slate-200 transition hover:bg-slate-700"
+                        className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 shadow-sm transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:bg-slate-700"
                       >
                         Edit
                       </button>
@@ -211,17 +205,17 @@ export default function Holidays() {
 
       {formOpen && isEmployer && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm dark:bg-black/60"
           role="dialog"
           aria-modal="true"
           aria-labelledby="holiday-form-title"
           onClick={closeForm}
         >
           <div
-            className="w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-xl"
+            className="w-full max-w-md rounded-2xl border border-slate-200 bg-stone-50 p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 id="holiday-form-title" className="text-lg font-semibold text-slate-100">
+            <h2 id="holiday-form-title" className="text-lg font-semibold text-slate-900 dark:text-slate-100">
               {formMode === 'add' ? 'Add holiday' : 'Edit holiday'}
             </h2>
             <p className="mt-1 text-sm text-slate-500">Name and the date it is observed.</p>
@@ -234,11 +228,11 @@ export default function Holidays() {
 
             <form onSubmit={submitForm} className="mt-5 flex flex-col gap-4">
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
                   Holiday name
                 </label>
                 <input
-                  className={inputClass}
+                  className="erp-input-inline"
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   required
@@ -246,17 +240,23 @@ export default function Holidays() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
                   Date
                 </label>
-                <input type="date" className={inputClass} value={formDate} onChange={(e) => setFormDate(e.target.value)} required />
+                <input
+                  type="date"
+                  className="erp-input-inline"
+                  value={formDate}
+                  onChange={(e) => setFormDate(e.target.value)}
+                  required
+                />
               </div>
               <div className="mt-2 flex gap-3">
                 <button
                   type="button"
                   disabled={formSaving}
                   onClick={closeForm}
-                  className="flex-1 rounded-xl border border-slate-600 bg-slate-800 py-2.5 text-sm font-medium text-slate-200 transition hover:bg-slate-700 disabled:opacity-50"
+                  className="flex-1 rounded-xl border border-slate-300 bg-white py-2.5 text-sm font-medium text-slate-800 transition hover:bg-slate-100 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                 >
                   Cancel
                 </button>
@@ -275,21 +275,21 @@ export default function Holidays() {
 
       {deleting && isEmployer && (
         <div
-          className="fixed inset-0 z-60 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-60 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm dark:bg-black/60"
           role="dialog"
           aria-modal="true"
           aria-labelledby="delete-holiday-title"
           onClick={closeDeleteConfirm}
         >
           <div
-            className="w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-xl"
+            className="w-full max-w-md rounded-2xl border border-slate-200 bg-stone-50 p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 id="delete-holiday-title" className="text-lg font-semibold text-slate-100">
+            <h2 id="delete-holiday-title" className="text-lg font-semibold text-slate-900 dark:text-slate-100">
               Remove holiday?
             </h2>
-            <p className="mt-2 text-sm text-slate-400">
-              <span className="font-medium text-slate-200">{deleting.name}</span> on{' '}
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+              <span className="font-medium text-slate-800 dark:text-slate-200">{deleting.name}</span> on{' '}
               {formatDisplayDate(deleting.date)} will be removed from the list.
             </p>
 
@@ -304,7 +304,7 @@ export default function Holidays() {
                 type="button"
                 disabled={deleteBusyId === deleting._id}
                 onClick={closeDeleteConfirm}
-                className="rounded-xl border border-slate-600 bg-slate-800 py-2.5 text-sm font-medium text-slate-200 transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-28"
+                className="rounded-xl border border-slate-300 bg-white py-2.5 text-sm font-medium text-slate-800 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 sm:min-w-28"
               >
                 Cancel
               </button>

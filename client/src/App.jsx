@@ -7,9 +7,14 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import EmployerAddEmployee from './pages/EmployerAddEmployee';
 import EmployerTeam from './pages/EmployerTeam';
+import EmployerAttendance from './pages/EmployerAttendance';
+import EmployerTasks from './pages/EmployerTasks';
+import EmployerLeaveRequests from './pages/EmployerLeaveRequests';
 import Holidays from './pages/Holidays';
 import Attendance from './pages/Attendance';
 import Leave from './pages/Leave';
+import Notifications from './pages/Notifications';
+import Tasks from './pages/Tasks';
 
 function App() {
   return (
@@ -46,6 +51,46 @@ function App() {
         element={
           <ProtectedRoute roles={['employee']}>
             <Leave />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/tasks"
+        element={
+          <ProtectedRoute roles={['employee']}>
+            <Tasks />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute roles={['employee', 'employer']}>
+            <Notifications />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employer/attendance"
+        element={
+          <ProtectedRoute roles={['employer']}>
+            <EmployerAttendance />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employer/tasks"
+        element={
+          <ProtectedRoute roles={['employer']}>
+            <EmployerTasks />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employer/leave-requests"
+        element={
+          <ProtectedRoute roles={['employer']}>
+            <EmployerLeaveRequests />
           </ProtectedRoute>
         }
       />

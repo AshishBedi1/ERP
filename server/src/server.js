@@ -8,6 +8,8 @@ const employerRoutes = require('./routes/employerRoutes');
 const holidayRoutes = require('./routes/holidayRoutes');
 const attendanceRoutes = require('./routes/attendanceRoutes');
 const leaveRoutes = require('./routes/leaveRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const taskRoutes = require('./routes/taskRoutes');
 
 connectDB();
 
@@ -22,6 +24,8 @@ app.use('/api/employer', employerRoutes);
 app.use('/api/holidays', holidayRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/leave', leaveRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/tasks', taskRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ success: true, message: 'ERP API running' }));

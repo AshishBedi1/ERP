@@ -1,7 +1,9 @@
 const LeaveRequest = require('../models/LeaveRequest');
 const User = require('../models/User');
 const Holiday = require('../models/Holiday');
+const Notification = require('../models/Notification');
 const { parseLocalDateInput } = require('../utils/parseLocalDate');
+const { getWorkDateString, getWorkTimezone } = require('../utils/workDate');
 const { inclusiveLocalDays, daysOverlappingCalendarYear } = require('../utils/leaveYear');
 
 /** Defaults aligned with company appointment terms (annual leave). */
@@ -63,6 +65,8 @@ exports.getSummary = async (req, res) => {
       return res.json({
         success: true,
         calendarYear: year,
+        todayYmd: getWorkDateString(),
+        workTimezone: getWorkTimezone(),
         message: 'Your account is not linked to an employer yet.',
         policy: p,
         publicHolidaysPolicyCount: p.publicHolidays,
@@ -108,6 +112,8 @@ exports.getSummary = async (req, res) => {
     res.json({
       success: true,
       calendarYear: year,
+      todayYmd: getWorkDateString(),
+      workTimezone: getWorkTimezone(),
       policy: {
         sick: p.sick,
         casual: p.casual,
@@ -168,6 +174,16 @@ exports.createRequest = async (req, res) => {
       });
     }
 
+    const startStr = String(s ?? '').split('T')[0];
+    const endStr = String(e ?? '').split('T')[0];
+    const todayYmd = getWorkDateString();
+    if (startStr < todayYmd || endStr < todayYmd) {
+      return res.status(400).json({
+        success: false,
+        message: 'Leave cannot be requested for yesterday or earlier. Choose today or a future date.',
+      });
+    }
+
     const startDate = parseLocalDateInput(s);
     const endDate = parseLocalDateInput(e);
     if (!startDate || !endDate) {
@@ -211,6 +227,23 @@ exports.createRequest = async (req, res) => {
       leaveType,
     });
 
+    const fmt = (d) => new Date(d).toLocaleDateString(undefined, { dateStyle: 'medium' });
+    const reasonSnippet =
+      typeof reason === 'string' && reason.trim() ? ` Note: ${reason.trim().slice(0, 200)}` : '';
+    try {
+      await Notification.create({
+        userId: req.user.employerId,
+        type: 'leave_request',
+        title: 'New leave request',
+        body: `${req.user.name || 'An employee'} requested ${leaveType} leave: ${fmt(startDate)} – ${fmt(endDate)} (${days} day${
+          days !== 1 ? 's' : ''
+        }).${reasonSnippet}`,
+        leaveRequestId: doc._id,
+      });
+    } catch (notifyErr) {
+      console.error('Employer leave notification error:', notifyErr);
+    }
+
     res.status(201).json({
       success: true,
       request: {
@@ -253,6 +286,115 @@ exports.listMyRequests = async (req, res) => {
     });
   } catch (error) {
     console.error('listMyRequests leave error:', error);
+    res.status(500).json({ success: false, message: 'Server error.' });
+  }
+};
+
+// @route   GET /api/employer/leave-requests
+// @access  Private (employer)
+exports.listForEmployer = async (req, res) => {
+  try {
+    if (req.user.role !== 'employer') {
+      return res.status(403).json({ success: false, message: 'Only employers can view team leave requests.' });
+    }
+
+    const { status } = req.query;
+    const q = { employerId: req.user.id };
+    if (status && ['pending', 'approved', 'rejected'].includes(status)) {
+      q.status = status;
+    }
+
+    const list = await LeaveRequest.find(q)
+      .populate('employeeId', 'name email')
+      .sort({ createdAt: -1 })
+      .limit(100)
+      .lean();
+
+    res.json({
+      success: true,
+      requests: list.map((r) => ({
+        id: r._id,
+        employeeId: r.employeeId?._id,
+        employeeName: r.employeeId?.name,
+        employeeEmail: r.employeeId?.email,
+        startDate: r.startDate,
+        endDate: r.endDate,
+        days: r.days,
+        status: r.status,
+        reason: r.reason,
+        leaveType: resolveLeaveType(r),
+        createdAt: r.createdAt,
+      })),
+    });
+  } catch (error) {
+    console.error('listForEmployer leave error:', error);
+    res.status(500).json({ success: false, message: 'Server error.' });
+  }
+};
+
+// @route   PATCH /api/employer/leave-requests/:id
+// @body    { "action": "approve" | "reject" }
+// @access  Private (employer)
+exports.decideLeaveRequest = async (req, res) => {
+  try {
+    if (req.user.role !== 'employer') {
+      return res.status(403).json({ success: false, message: 'Only employers can approve or reject leave.' });
+    }
+
+    const { action } = req.body;
+    if (!['approve', 'reject'].includes(action)) {
+      return res.status(400).json({ success: false, message: 'action must be approve or reject.' });
+    }
+
+    const doc = await LeaveRequest.findOne({
+      _id: req.params.id,
+      employerId: req.user.id,
+    });
+
+    if (!doc) {
+      return res.status(404).json({ success: false, message: 'Leave request not found.' });
+    }
+    if (doc.status !== 'pending') {
+      return res.status(400).json({ success: false, message: 'This request has already been processed.' });
+    }
+
+    doc.status = action === 'approve' ? 'approved' : 'rejected';
+    await doc.save();
+
+    const fmt = (d) => new Date(d).toLocaleDateString(undefined, { dateStyle: 'medium' });
+    const lt = resolveLeaveType(doc);
+    try {
+      await Notification.create({
+        userId: doc.employeeId,
+        type: 'leave_decision',
+        title: action === 'approve' ? 'Leave approved' : 'Leave rejected',
+        body: `${lt.charAt(0).toUpperCase() + lt.slice(1)} leave ${fmt(doc.startDate)} – ${fmt(doc.endDate)}: ${
+          action === 'approve' ? 'Approved by your employer.' : 'Rejected by your employer.'
+        }`,
+        leaveRequestId: doc._id,
+      });
+    } catch (notifyErr) {
+      console.error('Employee leave decision notification error:', notifyErr);
+    }
+
+    try {
+      await Notification.updateMany(
+        { userId: req.user.id, leaveRequestId: doc._id, type: 'leave_request' },
+        { $set: { read: true } }
+      );
+    } catch (_) {
+      /* non-fatal */
+    }
+
+    res.json({
+      success: true,
+      request: {
+        id: doc._id,
+        status: doc.status,
+      },
+    });
+  } catch (error) {
+    console.error('decideLeaveRequest error:', error);
     res.status(500).json({ success: false, message: 'Server error.' });
   }
 };

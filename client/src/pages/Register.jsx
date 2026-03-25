@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
-
-const inputClass =
-  'w-full rounded-xl border border-white/15 bg-slate-900 py-3.5 px-4 text-base text-slate-100 transition-all placeholder:text-slate-500 focus:border-sky-500 focus:outline-none focus:ring-[3px] focus:ring-sky-500/20';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function Register() {
   const [searchParams] = useSearchParams();
@@ -75,73 +73,76 @@ export default function Register() {
   };
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col items-center justify-center bg-slate-900 p-8">
-      <span className="absolute left-6 top-6 text-lg font-bold tracking-tight text-slate-200">ERP</span>
-      <div className="w-full max-w-[440px] shrink-0 rounded-2xl border border-white/10 bg-slate-900 p-10">
+    <div className="erp-page-auth relative flex min-h-screen w-full flex-col items-center justify-center px-4 py-8 sm:p-8">
+      <div className="absolute left-4 top-4 flex w-[calc(100%-2rem)] items-start justify-between sm:left-6 sm:top-6 sm:w-[calc(100%-3rem)]">
+        <span className="text-lg font-bold tracking-tight text-slate-800 dark:text-slate-200">ERP</span>
+        <ThemeToggle />
+      </div>
+      <div className="erp-panel-auth w-full max-w-[440px] shrink-0 p-6 sm:p-10">
         {isEmployeeInvite ? (
           <>
-            <h1 className="mb-1 text-2xl font-bold text-slate-100">Join as employee</h1>
-            <p className="mb-6 text-sm text-slate-400">
+            <h1 className="mb-1 text-2xl font-bold text-slate-900 dark:text-slate-100">Join as employee</h1>
+            <p className="mb-6 text-sm text-slate-600 dark:text-slate-400">
               {employerInfo
                 ? `${employerInfo.companyName || employerInfo.name} invited you`
                 : 'Complete your account'}
             </p>
             {employerInfo && (
-              <div className="mb-6 rounded-lg bg-sky-500/20 px-3 py-2 text-sm text-sky-400">
+              <div className="mb-6 rounded-lg bg-sky-100 px-3 py-2 text-sm text-sky-800 dark:bg-sky-500/20 dark:text-sky-300">
                 {employerInfo.companyName || employerInfo.name}
               </div>
             )}
           </>
         ) : (
           <>
-            <h1 className="mb-1 text-2xl font-bold text-slate-100">Register your company</h1>
-            <p className="mb-6 text-sm text-slate-400">Create an employer account for your team</p>
+            <h1 className="mb-1 text-2xl font-bold text-slate-900 dark:text-slate-100">Register your company</h1>
+            <p className="mb-6 text-sm text-slate-600 dark:text-slate-400">Create an employer account for your team</p>
           </>
         )}
 
         {error && (
-          <div className="mb-6 rounded-lg bg-red-500/15 px-4 py-3 text-sm text-red-400">{error}</div>
+          <div className="mb-6 rounded-lg bg-red-500/15 px-4 py-3 text-sm text-red-600 dark:text-red-400">{error}</div>
         )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {!isEmployeeInvite && (
             <label className="flex flex-col gap-2">
-              <span className="text-sm font-medium text-slate-400">Company name</span>
+              <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Company name</span>
               <input
                 type="text"
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
                 placeholder="Acme Inc."
                 required
-                className={inputClass}
+                className="erp-input"
               />
             </label>
           )}
 
           <label className="flex flex-col gap-2">
-            <span className="text-sm font-medium text-slate-400">Full name</span>
+            <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Full name</span>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="John Doe"
               required
-              className={inputClass}
+              className="erp-input"
             />
           </label>
           <label className="flex flex-col gap-2">
-            <span className="text-sm font-medium text-slate-400">Email</span>
+            <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Email</span>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@company.com"
               required
-              className={inputClass}
+              className="erp-input"
             />
           </label>
           <label className="flex flex-col gap-2">
-            <span className="text-sm font-medium text-slate-400">Password</span>
+            <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Password</span>
             <input
               type="password"
               value={password}
@@ -149,21 +150,21 @@ export default function Register() {
               placeholder="Min 6 characters"
               minLength={6}
               required
-              className={inputClass}
+              className="erp-input"
             />
           </label>
           <button
             type="submit"
             disabled={loading}
-            className="w-full cursor-pointer rounded-xl bg-sky-500 py-3.5 text-base font-semibold text-white transition-colors hover:bg-sky-400 disabled:opacity-60"
+            className="w-full cursor-pointer rounded-xl bg-sky-600 py-3.5 text-base font-semibold text-white transition-colors hover:bg-sky-500 disabled:opacity-60 dark:bg-sky-500 dark:hover:bg-sky-400"
           >
             {loading ? 'Creating account...' : isEmployeeInvite ? 'Create account' : 'Register company'}
           </button>
         </form>
 
-        <p className="mt-7 border-t border-white/10 pt-6 text-center text-sm text-slate-400">
+        <p className="mt-7 border-t border-slate-200 pt-6 text-center text-sm text-slate-600 dark:border-white/10 dark:text-slate-400">
           Already have an account?{' '}
-          <Link to="/login" className="font-medium text-sky-400 hover:text-sky-300">
+          <Link to="/login" className="erp-link font-medium">
             Login
           </Link>
         </p>

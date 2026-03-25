@@ -1,6 +1,7 @@
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { EmployerIllustration, EmployeeIllustration } from '../components/RoleIllustrations';
+import ThemeToggle from '../components/ThemeToggle';
 
 const ROLES = [
   { id: 'employer', label: 'Employer', Icon: EmployerIllustration },
@@ -18,36 +19,39 @@ export default function RoleSelect() {
   };
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col items-center justify-center bg-slate-900 px-4 py-12">
-      <span className="absolute left-6 top-6 text-lg font-bold tracking-tight text-slate-200">ERP</span>
-      <h1 className="text-2xl font-bold text-slate-100">Sign in</h1>
-      <p className="mt-2 text-sm text-slate-400">Choose how you&apos;re signing in</p>
+    <div className="erp-page-auth relative flex min-h-screen w-full flex-col items-center justify-center px-4 py-12">
+      <div className="absolute left-6 top-6 flex w-[calc(100%-3rem)] items-start justify-between">
+        <span className="text-lg font-bold tracking-tight text-slate-800 dark:text-slate-200">ERP</span>
+        <ThemeToggle />
+      </div>
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Sign in</h1>
+      <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Choose how you&apos;re signing in</p>
 
       <div className="mt-10 grid w-full max-w-2xl grid-cols-1 gap-5 md:grid-cols-2">
         {ROLES.map(({ id, label, Icon }) => (
           <button
             key={id}
             type="button"
-            className="flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900 text-center transition hover:border-white/25 hover:bg-slate-900"
-              onClick={() => handleSelect(id)}
-            >
-            <div className="flex h-[140px] items-center justify-center bg-slate-900 p-4">
+            className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-stone-50/90 text-center shadow-sm shadow-slate-200/60 transition hover:border-slate-300 hover:bg-slate-100 dark:border-white/10 dark:bg-slate-900 dark:shadow-none dark:hover:border-white/25 dark:hover:bg-slate-900"
+            onClick={() => handleSelect(id)}
+          >
+            <div className="flex h-[140px] items-center justify-center bg-slate-100/80 p-4 dark:bg-slate-900">
               <Icon />
             </div>
-            <div className="border-t border-white/10 py-5">
-              <span className="text-base font-semibold text-slate-100">{label}</span>
+            <div className="border-t border-slate-200 py-5 dark:border-white/10">
+              <span className="text-base font-semibold text-slate-900 dark:text-slate-100">{label}</span>
             </div>
           </button>
         ))}
       </div>
 
-      <p className="mt-10 text-center text-sm text-slate-400">
+      <p className="mt-10 text-center text-sm text-slate-600 dark:text-slate-400">
         New company?{' '}
-        <Link to="/register" className="font-medium text-sky-400 hover:text-sky-300">
+        <Link to="/register" className="erp-link font-medium">
           Register as employer
         </Link>
       </p>
-      <p className="mt-2 max-w-sm text-center text-xs text-slate-500">
+      <p className="mt-2 max-w-sm text-center text-xs text-slate-500 dark:text-slate-500">
         Employees join only with an invite link from your employer.
       </p>
     </div>

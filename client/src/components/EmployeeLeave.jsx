@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
 const shellClass =
-  'relative rounded-3xl border border-slate-700/50 bg-linear-to-b from-slate-800/90 via-slate-900/95 to-slate-950 shadow-2xl shadow-black/50 ring-1 ring-white/[0.06]';
+  'relative rounded-3xl border border-slate-200/90 bg-gradient-to-b from-stone-50 via-slate-50 to-slate-100 shadow-xl shadow-slate-300/40 ring-1 ring-slate-200/70 dark:border-slate-700/50 dark:from-slate-800/90 dark:via-slate-900/95 dark:to-slate-950 dark:shadow-black/50 dark:ring-white/[0.06]';
 
 function formatShortDate(iso) {
   if (!iso) return '';
@@ -19,6 +19,70 @@ const LEAVE_TYPES = [
   { value: 'casual', label: 'Casual leave' },
   { value: 'earned', label: 'Earned leave' },
 ];
+
+function CalendarIcon() {
+  return (
+    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5a2.25 2.25 0 002.25-2.25m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5a2.25 2.25 0 012.25 2.25v7.5"
+      />
+    </svg>
+  );
+}
+
+function maxYmd(a, b) {
+  if (!a) return b;
+  if (!b) return a;
+  return a >= b ? a : b;
+}
+
+function DatePickerField({ id, label, value, onChange, min }) {
+  const inputRef = useRef(null);
+
+  const openPicker = () => {
+    const el = inputRef.current;
+    if (!el) return;
+    if (typeof el.showPicker === 'function') {
+      try {
+        el.showPicker();
+        return;
+      } catch {
+        /* fallback */
+      }
+    }
+    el.focus();
+    el.click();
+  };
+
+  return (
+    <div className="w-full min-w-0 sm:w-auto sm:min-w-[11rem]">
+      <label htmlFor={id} className="block text-[11px] font-medium uppercase tracking-wide text-slate-500">
+        {label}
+      </label>
+      <div className="relative mt-1">
+        <input
+          ref={inputRef}
+          id={id}
+          type="date"
+          value={value}
+          {...(min ? { min } : {})}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full min-h-[44px] cursor-pointer rounded-xl border border-slate-600 bg-slate-950 py-2.5 pl-3 pr-12 text-sm text-slate-100 [color-scheme:dark] focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-10 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+        />
+        <button
+          type="button"
+          onClick={openPicker}
+          className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-800 hover:text-slate-200"
+          aria-label={`Open calendar for ${label}`}
+        >
+          <CalendarIcon />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function BucketCard({ title, sub, entitlement, pending, approved, remaining, tone }) {
   const tones = {
@@ -88,11 +152,32 @@ export default function EmployeeLeave() {
     load();
   }, [load, noEmployer]);
 
+  const minLeaveYmd = useMemo(() => {
+    if (summary?.todayYmd) return summary.todayYmd;
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }, [summary?.todayYmd]);
+
+  useEffect(() => {
+    setStartDate((prev) => (prev && prev < minLeaveYmd ? '' : prev));
+    setEndDate((prev) => (prev && prev < minLeaveYmd ? '' : prev));
+  }, [minLeaveYmd]);
+
+  useEffect(() => {
+    if (startDate && endDate && endDate < startDate) {
+      setEndDate(startDate);
+    }
+  }, [startDate, endDate]);
+
   const submitRequest = async (e) => {
     e.preventDefault();
     setError('');
     if (!startDate || !endDate) {
       setError('Choose a start and end date.');
+      return;
+    }
+    if (startDate < minLeaveYmd || endDate < minLeaveYmd) {
+      setError('You cannot request leave for yesterday or earlier. Choose today or a future date.');
       return;
     }
     setSubmitting(true);
@@ -196,6 +281,14 @@ export default function EmployeeLeave() {
         <div className="mt-8 rounded-2xl border border-slate-700/60 bg-slate-900/40 p-5 sm:p-6">
           <h2 className="text-sm font-semibold text-slate-200">Request leave</h2>
           <p className="mt-1 text-xs text-slate-500">
+            Dates use the company work calendar
+            {summary?.workTimezone ? (
+              <span className="text-slate-600"> ({summary.workTimezone.replace(/_/g, ' ')})</span>
+            ) : null}
+            . You can only select <strong className="font-medium text-slate-400">today or future dates</strong> — past days
+            (including yesterday) cannot be requested here.
+          </p>
+          <p className="mt-2 text-xs text-slate-500">
             Give at least one day notice where possible. Sick leave: attach doctor&apos;s note when required.
           </p>
           <form onSubmit={submitRequest} className="mt-4 flex flex-col gap-4">
@@ -216,32 +309,22 @@ export default function EmployeeLeave() {
                 ))}
               </select>
             </div>
-            <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end">
-              <div>
-                <label htmlFor="leave-start" className="block text-[11px] font-medium uppercase tracking-wide text-slate-500">
-                  From
-                </label>
-                <input
-                  id="leave-start"
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="mt-1 rounded-xl border border-slate-600 bg-slate-950 px-3 py-2 text-sm text-slate-100"
-                />
-              </div>
-              <div>
-                <label htmlFor="leave-end" className="block text-[11px] font-medium uppercase tracking-wide text-slate-500">
-                  To
-                </label>
-                <input
-                  id="leave-end"
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="mt-1 rounded-xl border border-slate-600 bg-slate-950 px-3 py-2 text-sm text-slate-100"
-                />
-              </div>
-              <div className="min-w-[200px] flex-1">
+            <div className="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-end">
+              <DatePickerField
+                id="leave-start"
+                label="From"
+                value={startDate}
+                min={minLeaveYmd}
+                onChange={setStartDate}
+              />
+              <DatePickerField
+                id="leave-end"
+                label="To"
+                value={endDate}
+                min={startDate ? maxYmd(startDate, minLeaveYmd) : minLeaveYmd}
+                onChange={setEndDate}
+              />
+              <div className="min-w-0 flex-1 lg:min-w-[200px]">
                 <label htmlFor="leave-reason" className="block text-[11px] font-medium uppercase tracking-wide text-slate-500">
                   Reason / notes
                 </label>
@@ -251,13 +334,13 @@ export default function EmployeeLeave() {
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   placeholder={leaveType === 'sick' ? 'e.g. medical — doctor note to follow' : 'e.g. personal'}
-                  className="mt-1 w-full rounded-xl border border-slate-600 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600"
+                  className="mt-1 min-h-[44px] w-full rounded-xl border border-slate-600 bg-slate-950 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600"
                 />
               </div>
               <button
                 type="submit"
                 disabled={submitting}
-                className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-900/25 transition hover:bg-emerald-500 disabled:opacity-60"
+                className="min-h-[44px] shrink-0 rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-900/25 transition hover:bg-emerald-500 disabled:opacity-60"
               >
                 {submitting ? 'Submitting…' : 'Submit request'}
               </button>

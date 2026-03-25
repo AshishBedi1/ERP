@@ -1,12 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import AppShell, { EMPLOYER_TEAM_REFRESH } from '../components/AppShell';
-
-const cardClass =
-  'rounded-2xl border border-slate-700/80 bg-slate-800/50 shadow-lg shadow-black/20 backdrop-blur-sm';
-
-const inputClass =
-  'w-full rounded-xl border border-slate-600 bg-slate-950/80 px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/25';
+import AttendanceCalendarModal from '../components/AttendanceCalendarModal';
 
 function refreshTeam() {
   window.dispatchEvent(new Event(EMPLOYER_TEAM_REFRESH));
@@ -34,6 +29,9 @@ export default function EmployerTeam() {
   const [deleteBusyId, setDeleteBusyId] = useState(null);
   const [deleting, setDeleting] = useState(null);
   const [deleteError, setDeleteError] = useState('');
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [calendarSubject, setCalendarSubject] = useState(null);
+  const [workDateHint, setWorkDateHint] = useState('');
 
   useEffect(() => {
     const load = () => {
@@ -45,6 +43,12 @@ export default function EmployerTeam() {
     load();
     window.addEventListener(EMPLOYER_TEAM_REFRESH, load);
     return () => window.removeEventListener(EMPLOYER_TEAM_REFRESH, load);
+  }, []);
+
+  useEffect(() => {
+    axios.get('/api/attendance/team-today').then(({ data }) => {
+      setWorkDateHint(data.workDate || '');
+    }).catch(() => setWorkDateHint(''));
   }, []);
 
   useEffect(() => {
@@ -103,6 +107,16 @@ export default function EmployerTeam() {
     setDeleteError('');
   };
 
+  const openEmployeeCalendar = (emp) => {
+    setCalendarSubject({ id: String(emp._id), name: emp.name });
+    setCalendarOpen(true);
+  };
+
+  const closeEmployeeCalendar = () => {
+    setCalendarOpen(false);
+    setCalendarSubject(null);
+  };
+
   const confirmDelete = async () => {
     if (!deleting) return;
     setDeleteError('');
@@ -122,31 +136,38 @@ export default function EmployerTeam() {
   return (
     <AppShell>
       <div className="mx-auto max-w-xl">
-        <header className="mb-8 border-b border-slate-800 pb-6">
+        <header className="mb-8 border-b border-slate-200 pb-6 dark:border-slate-800">
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Team</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-100">Your team</h1>
-          <p className="mt-1.5 text-sm text-slate-500">People in your organization</p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">Your team</h1>
+          <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-500">People in your organization</p>
         </header>
 
-        <div className={`overflow-hidden ${cardClass}`}>
+        <div className="erp-card overflow-hidden">
           {employees.length === 0 ? (
             <div className="px-6 py-10 text-center text-sm text-slate-500">No employees yet</div>
           ) : (
-            <ul className="divide-y divide-slate-700/60">
+            <ul className="divide-y divide-slate-200 dark:divide-slate-700/60">
               {employees.map((emp) => (
                 <li
                   key={emp._id}
                   className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-slate-100">{emp.name}</p>
-                    <p className="truncate text-sm text-slate-400">{emp.email}</p>
+                    <button
+                      type="button"
+                      onClick={() => openEmployeeCalendar(emp)}
+                      title="View attendance calendar"
+                      className="block rounded-sm text-left font-medium text-slate-900 hover:text-blue-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 dark:text-slate-100 dark:hover:text-blue-300"
+                    >
+                      {emp.name}
+                    </button>
+                    <p className="truncate text-sm text-slate-600 dark:text-slate-400">{emp.email}</p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
                     <button
                       type="button"
                       onClick={() => openEdit(emp)}
-                      className="rounded-lg border border-slate-600 bg-slate-800/80 px-3 py-1.5 text-xs font-medium text-slate-200 transition hover:bg-slate-700"
+                      className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 shadow-sm transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:bg-slate-700"
                     >
                       Edit
                     </button>
@@ -168,13 +189,13 @@ export default function EmployerTeam() {
 
       {editing && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm dark:bg-black/60"
           role="dialog"
           aria-modal="true"
           aria-labelledby="edit-employee-title"
         >
-          <div className="w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-xl">
-            <h2 id="edit-employee-title" className="text-lg font-semibold text-slate-100">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-stone-50 p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+            <h2 id="edit-employee-title" className="text-lg font-semibold text-slate-900 dark:text-slate-100">
               Edit employee
             </h2>
             <p className="mt-1 text-sm text-slate-500">Update their details or set a new password.</p>
@@ -187,11 +208,11 @@ export default function EmployerTeam() {
 
             <form onSubmit={saveEdit} className="mt-5 flex flex-col gap-4">
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
                   Full name
                 </label>
                 <input
-                  className={inputClass}
+                  className="erp-input-inline"
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
                   required
@@ -199,12 +220,12 @@ export default function EmployerTeam() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
                   Work email
                 </label>
                 <input
                   type="email"
-                  className={inputClass}
+                  className="erp-input-inline"
                   value={editEmail}
                   onChange={(e) => setEditEmail(e.target.value)}
                   required
@@ -212,24 +233,24 @@ export default function EmployerTeam() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
                   Date of joining
                 </label>
                 <input
                   type="date"
-                  className={inputClass}
+                  className="erp-input-inline"
                   value={editDoj}
                   onChange={(e) => setEditDoj(e.target.value)}
                 />
                 <p className="mt-1 text-xs text-slate-500">HR record (e.g. for service length).</p>
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
                   New password <span className="font-normal normal-case text-slate-500">(optional)</span>
                 </label>
                 <input
                   type="password"
-                  className={inputClass}
+                  className="erp-input-inline"
                   value={editPassword}
                   onChange={(e) => setEditPassword(e.target.value)}
                   placeholder="Leave blank to keep current"
@@ -240,7 +261,7 @@ export default function EmployerTeam() {
                 <button
                   type="button"
                   onClick={closeEdit}
-                  className="flex-1 rounded-xl border border-slate-600 bg-slate-800 py-2.5 text-sm font-medium text-slate-200 transition hover:bg-slate-700"
+                  className="flex-1 rounded-xl border border-slate-300 bg-white py-2.5 text-sm font-medium text-slate-800 transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                 >
                   Cancel
                 </button>
@@ -257,9 +278,17 @@ export default function EmployerTeam() {
         </div>
       )}
 
+      <AttendanceCalendarModal
+        open={calendarOpen}
+        onClose={closeEmployeeCalendar}
+        workDate={workDateHint}
+        viewForEmployeeId={calendarSubject?.id}
+        employeeName={calendarSubject?.name}
+      />
+
       {deleting && (
         <div
-          className="fixed inset-0 z-60 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-60 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm dark:bg-black/60"
           role="dialog"
           aria-modal="true"
           aria-labelledby="delete-employee-title"
@@ -267,14 +296,15 @@ export default function EmployerTeam() {
           onClick={closeDeleteConfirm}
         >
           <div
-            className="w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-xl"
+            className="w-full max-w-md rounded-2xl border border-slate-200 bg-stone-50 p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 id="delete-employee-title" className="text-lg font-semibold text-slate-100">
+            <h2 id="delete-employee-title" className="text-lg font-semibold text-slate-900 dark:text-slate-100">
               Remove from team?
             </h2>
-            <p id="delete-employee-desc" className="mt-2 text-sm leading-relaxed text-slate-400">
-              <span className="font-medium text-slate-200">{deleting.name}</span> will be removed from your
+            <p id="delete-employee-desc" className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+              <span className="font-medium text-slate-800 dark:text-slate-200">{deleting.name}</span> will be removed from
+              your
               organization. They will no longer be able to sign in with this account.
             </p>
             <p className="mt-2 text-xs text-slate-500">{deleting.email}</p>
@@ -290,7 +320,7 @@ export default function EmployerTeam() {
                 type="button"
                 disabled={deleteBusyId === deleting._id}
                 onClick={closeDeleteConfirm}
-                className="rounded-xl border border-slate-600 bg-slate-800 py-2.5 text-sm font-medium text-slate-200 transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-28"
+                className="rounded-xl border border-slate-300 bg-white py-2.5 text-sm font-medium text-slate-800 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 sm:min-w-28"
               >
                 Cancel
               </button>

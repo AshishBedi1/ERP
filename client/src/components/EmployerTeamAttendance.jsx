@@ -22,15 +22,20 @@ function formatDuration(att) {
 
 function statusLabel(row) {
   const att = row.attendance;
-  if (!att?.startedAt) return { text: 'Not logged in', tone: 'slate' };
-  if (!att.endedAt) return { text: 'In session', tone: 'emerald' };
-  return { text: 'Completed', tone: 'blue' };
+  if (att?.startedAt) {
+    if (!att.endedAt) return { text: 'In session', tone: 'emerald' };
+    return { text: 'Completed', tone: 'blue' };
+  }
+  if (row.leaveToday === 'approved') return { text: 'On leave', tone: 'amber' };
+  if (row.leaveToday === 'pending') return { text: 'Leave pending', tone: 'amber' };
+  return { text: 'Not logged in', tone: 'slate' };
 }
 
 const toneClasses = {
   slate: 'bg-slate-700/50 text-slate-300',
   emerald: 'bg-emerald-500/20 text-emerald-300',
   blue: 'bg-blue-500/20 text-blue-300',
+  amber: 'bg-amber-500/20 text-amber-200',
 };
 
 function toDatetimeLocalValue(iso) {

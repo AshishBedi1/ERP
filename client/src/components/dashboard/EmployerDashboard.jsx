@@ -23,9 +23,12 @@ function formatHolidayDate(iso) {
 
 function rowStatus(row) {
   const att = row.attendance;
-  if (!att?.startedAt) return 'notIn';
-  if (!att.endedAt) return 'inSession';
-  return 'done';
+  if (att?.startedAt) {
+    if (!att.endedAt) return 'inSession';
+    return 'done';
+  }
+  if (row.leaveToday === 'approved' || row.leaveToday === 'pending') return 'onLeave';
+  return 'notIn';
 }
 
 export default function EmployerDashboard() {
@@ -60,6 +63,7 @@ export default function EmployerDashboard() {
   }, []);
 
   const notIn = team.filter((r) => rowStatus(r) === 'notIn').length;
+  const onLeave = team.filter((r) => rowStatus(r) === 'onLeave').length;
   const inSession = team.filter((r) => rowStatus(r) === 'inSession').length;
   const done = team.filter((r) => rowStatus(r) === 'done').length;
   const tasksSubmitted = team.filter((r) => (r.todayTasks || '').trim().length > 0).length;
@@ -106,8 +110,8 @@ export default function EmployerDashboard() {
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Team today</p>
               <p className="mt-1 text-[11px] text-slate-600 dark:text-slate-500">
-                Team size = people on your roster. Clocked in = working now. Finished for today = logged out. Not clocked
-                in yet = no login today.
+                Team size = roster count. Clocked in / finished = attendance today. On leave = approved or pending leave
+                for this work day. Not clocked in yet = no login and not on leave.
               </p>
             </div>
             <Link
@@ -117,7 +121,7 @@ export default function EmployerDashboard() {
               Attendance
             </Link>
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             <div className="rounded-xl border border-slate-200/90 bg-slate-100/90 px-4 py-3 text-center dark:border-slate-700/60 dark:bg-slate-900/40">
               <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{headcount}</p>
               <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500">Team size</p>
@@ -132,6 +136,12 @@ export default function EmployerDashboard() {
               <p className="text-2xl font-bold text-blue-800 dark:text-blue-200">{done}</p>
               <p className="text-[11px] font-medium uppercase tracking-wide text-blue-700 dark:text-blue-400/80">
                 Finished for today
+              </p>
+            </div>
+            <div className="rounded-xl border border-amber-300/80 bg-amber-50 px-4 py-3 text-center dark:border-amber-500/30 dark:bg-amber-950/20">
+              <p className="text-2xl font-bold text-amber-800 dark:text-amber-200">{onLeave}</p>
+              <p className="text-[11px] font-medium uppercase tracking-wide text-amber-800 dark:text-amber-400/80">
+                On leave
               </p>
             </div>
             <div className="rounded-xl border border-slate-200/90 bg-slate-100/90 px-4 py-3 text-center dark:border-slate-600/80 dark:bg-slate-900/40">

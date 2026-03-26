@@ -136,6 +136,31 @@ exports.getTeamToday = async (req, res) => {
       .sort({ name: 1 })
       .lean();
 
+    const employeeIds = employees.map((e) => e._id);
+    const [wy, wm, wd] = workDate.split('-').map(Number);
+    const dayStart = new Date(wy, wm - 1, wd, 0, 0, 0, 0);
+    const dayEnd = new Date(wy, wm - 1, wd, 23, 59, 59, 999);
+
+    /** Approved leave wins over pending when both overlap the work day. */
+    const leaveTodayByEmployee = new Map();
+    if (employeeIds.length > 0) {
+      const overlappingLeaves = await LeaveRequest.find({
+        employerId: req.user.id,
+        employeeId: { $in: employeeIds },
+        status: { $in: ['pending', 'approved'] },
+        startDate: { $lte: dayEnd },
+        endDate: { $gte: dayStart },
+      }).lean();
+
+      for (const lv of overlappingLeaves) {
+        const eid = lv.employeeId.toString();
+        const cur = leaveTodayByEmployee.get(eid);
+        if (!cur || lv.status === 'approved') {
+          leaveTodayByEmployee.set(eid, lv.status);
+        }
+      }
+    }
+
     const records = await Attendance.find({ employerId: req.user.id, workDate }).lean();
     const byEmployeeId = new Map(records.map((r) => [r.employeeId.toString(), r]));
 
@@ -160,12 +185,14 @@ exports.getTeamToday = async (req, res) => {
 
     const team = employees.map((emp) => {
       const raw = byEmployeeId.get(emp._id.toString());
+      const leaveToday = leaveTodayByEmployee.get(emp._id.toString()) || null;
       return {
         employeeId: emp._id,
         name: emp.name,
         email: emp.email,
         attendance: augmentAttendance(raw),
         todayTasks: textByEmployeeId.get(emp._id.toString()) || '',
+        leaveToday,
       };
     });
 

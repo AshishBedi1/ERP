@@ -49,6 +49,7 @@ export default function EmployeeTodayTasks() {
   const [baselineDraft, setBaselineDraft] = useState('');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [polishing, setPolishing] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
   const [lastSaved, setLastSaved] = useState('');
   const areaRef = useRef(null);
@@ -122,6 +123,32 @@ export default function EmployeeTodayTasks() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [confirmKind]);
+
+  const polishWithAi = useCallback(async () => {
+    const t = content.trim();
+    if (!t.length || polishing || saving) return;
+    setPolishing(true);
+    setError('');
+    try {
+      const { data } = await axios.post('/api/ai/refine-plan', { text: content });
+      const next = typeof data.text === 'string' ? data.text : '';
+      if (!next.trim()) {
+        setError('AI returned empty text. Try again.');
+        return;
+      }
+      if (next.length > 10000) {
+        setContent(next.slice(0, 10000));
+      } else {
+        setContent(next);
+      }
+      setSavedFlash(false);
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Could not refine text.';
+      setError(msg);
+    } finally {
+      setPolishing(false);
+    }
+  }, [content, polishing, saving]);
 
   const savePlanNow = useCallback(async () => {
     const ok = await persist(content);
@@ -245,6 +272,7 @@ export default function EmployeeTodayTasks() {
               if (v.length > 10000) return;
               setContent(v);
               setSavedFlash(false);
+              setError('');
             }}
             onKeyDown={(e) => {
               if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -262,10 +290,19 @@ export default function EmployeeTodayTasks() {
             <button
               type="button"
               onClick={() => void savePlanNow()}
-              disabled={saving}
+              disabled={saving || polishing}
               className="inline-flex items-center justify-center rounded-xl bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-sky-900/25 transition hover:bg-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/40 disabled:opacity-60"
             >
               {saving ? 'Saving…' : 'Save plan'}
+            </button>
+            <button
+              type="button"
+              onClick={() => void polishWithAi()}
+              disabled={saving || polishing || !content.trim()}
+              title="Improve grammar and professional tone (uses AI)"
+              className="inline-flex items-center justify-center rounded-xl border border-violet-400/70 bg-violet-100 px-5 py-2.5 text-sm font-semibold text-violet-900 transition hover:bg-violet-200 focus:outline-none focus:ring-2 focus:ring-violet-500/35 disabled:cursor-not-allowed disabled:opacity-50 dark:border-violet-500/50 dark:bg-violet-950/40 dark:text-violet-200 dark:hover:bg-violet-900/50"
+            >
+              {polishing ? 'Polishing…' : 'Polish with AI'}
             </button>
             <span className="text-xs text-slate-600" title="Keyboard shortcut">
               Ctrl+S / ⌘S
@@ -277,6 +314,8 @@ export default function EmployeeTodayTasks() {
               <span className="font-medium text-emerald-400/90">Plan saved</span>
             ) : saving ? (
               <span>Saving…</span>
+            ) : polishing ? (
+              <span>Polishing with AI…</span>
             ) : dirty ? (
               <span className="font-medium text-amber-400/90">Unsaved changes</span>
             ) : content.trim() ? (

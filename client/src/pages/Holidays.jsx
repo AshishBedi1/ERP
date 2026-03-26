@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import AppShell from '../components/AppShell';
+import DatePickerField from '../components/DatePickerField';
 import { useAuth } from '../context/AuthContext';
 
 function toInputDate(iso) {
@@ -182,7 +183,7 @@ export default function Holidays() {
                       <button
                         type="button"
                         onClick={() => openEdit(h)}
-                        className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 shadow-sm transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:bg-slate-700"
+                        className="rounded-lg border border-slate-400/70 bg-slate-300/70 px-3 py-1.5 text-xs font-medium text-slate-800 shadow-sm transition hover:bg-slate-400/55 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:bg-slate-700"
                       >
                         Edit
                       </button>
@@ -212,7 +213,7 @@ export default function Holidays() {
           onClick={closeForm}
         >
           <div
-            className="w-full max-w-md rounded-2xl border border-slate-200 bg-stone-50 p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+            className="w-full max-w-md rounded-2xl border border-slate-300/80 bg-slate-200/90 p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 id="holiday-form-title" className="text-lg font-semibold text-slate-900 dark:text-slate-100">
@@ -240,14 +241,12 @@ export default function Holidays() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  className="erp-input-inline"
+                <DatePickerField
+                  id="holiday-date"
+                  label="Date"
                   value={formDate}
-                  onChange={(e) => setFormDate(e.target.value)}
+                  onChange={setFormDate}
+                  variant="modal"
                   required
                 />
               </div>
@@ -256,7 +255,7 @@ export default function Holidays() {
                   type="button"
                   disabled={formSaving}
                   onClick={closeForm}
-                  className="flex-1 rounded-xl border border-slate-300 bg-white py-2.5 text-sm font-medium text-slate-800 transition hover:bg-slate-100 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                  className="flex-1 rounded-xl border border-slate-400/70 bg-slate-300/70 py-2.5 text-sm font-medium text-slate-800 transition hover:bg-slate-400/55 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                 >
                   Cancel
                 </button>
@@ -282,7 +281,7 @@ export default function Holidays() {
           onClick={closeDeleteConfirm}
         >
           <div
-            className="w-full max-w-md rounded-2xl border border-slate-200 bg-stone-50 p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+            className="w-full max-w-md rounded-2xl border border-slate-300/80 bg-slate-200/90 p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 id="delete-holiday-title" className="text-lg font-semibold text-slate-900 dark:text-slate-100">
@@ -304,7 +303,7 @@ export default function Holidays() {
                 type="button"
                 disabled={deleteBusyId === deleting._id}
                 onClick={closeDeleteConfirm}
-                className="rounded-xl border border-slate-300 bg-white py-2.5 text-sm font-medium text-slate-800 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 sm:min-w-28"
+                className="rounded-xl border border-slate-400/70 bg-slate-300/70 py-2.5 text-sm font-medium text-slate-800 transition hover:bg-slate-400/55 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 sm:min-w-28"
               >
                 Cancel
               </button>

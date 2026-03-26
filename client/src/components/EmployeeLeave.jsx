@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import DatePickerField from './DatePickerField';
 
 const shellClass =
-  'relative rounded-3xl border border-slate-200/90 bg-gradient-to-b from-stone-50 via-slate-50 to-slate-100 shadow-xl shadow-slate-300/40 ring-1 ring-slate-200/70 dark:border-slate-700/50 dark:from-slate-800/90 dark:via-slate-900/95 dark:to-slate-950 dark:shadow-black/50 dark:ring-white/[0.06]';
+  'relative rounded-3xl border border-slate-300/80 bg-gradient-to-b from-slate-200/80 via-slate-100 to-slate-300/60 shadow-xl shadow-slate-400/30 ring-1 ring-slate-300/60 dark:border-slate-700/50 dark:from-slate-800/90 dark:via-slate-900/95 dark:to-slate-950 dark:shadow-black/50 dark:ring-white/[0.06]';
 
 function formatShortDate(iso) {
   if (!iso) return '';
@@ -20,68 +21,10 @@ const LEAVE_TYPES = [
   { value: 'earned', label: 'Earned leave' },
 ];
 
-function CalendarIcon() {
-  return (
-    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5a2.25 2.25 0 002.25-2.25m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5a2.25 2.25 0 012.25 2.25v7.5"
-      />
-    </svg>
-  );
-}
-
 function maxYmd(a, b) {
   if (!a) return b;
   if (!b) return a;
   return a >= b ? a : b;
-}
-
-function DatePickerField({ id, label, value, onChange, min }) {
-  const inputRef = useRef(null);
-
-  const openPicker = () => {
-    const el = inputRef.current;
-    if (!el) return;
-    if (typeof el.showPicker === 'function') {
-      try {
-        el.showPicker();
-        return;
-      } catch {
-        /* fallback */
-      }
-    }
-    el.focus();
-    el.click();
-  };
-
-  return (
-    <div className="w-full min-w-0 sm:w-auto sm:min-w-[11rem]">
-      <label htmlFor={id} className="block text-[11px] font-medium uppercase tracking-wide text-slate-500">
-        {label}
-      </label>
-      <div className="relative mt-1">
-        <input
-          ref={inputRef}
-          id={id}
-          type="date"
-          value={value}
-          {...(min ? { min } : {})}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full min-h-[44px] cursor-pointer rounded-xl border border-slate-600 bg-slate-950 py-2.5 pl-3 pr-12 text-sm text-slate-100 [color-scheme:dark] focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-10 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
-        />
-        <button
-          type="button"
-          onClick={openPicker}
-          className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-800 hover:text-slate-200"
-          aria-label={`Open calendar for ${label}`}
-        >
-          <CalendarIcon />
-        </button>
-      </div>
-    </div>
-  );
 }
 
 function BucketCard({ title, sub, entitlement, pending, approved, remaining, tone }) {

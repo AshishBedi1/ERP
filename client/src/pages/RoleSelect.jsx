@@ -32,13 +32,13 @@ export default function RoleSelect() {
           <button
             key={id}
             type="button"
-            className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-stone-50/90 text-center shadow-sm shadow-slate-200/60 transition hover:border-slate-300 hover:bg-slate-100 dark:border-white/10 dark:bg-slate-900 dark:shadow-none dark:hover:border-white/25 dark:hover:bg-slate-900"
+            className="flex flex-col overflow-hidden rounded-2xl border border-slate-300/80 bg-slate-200/70 text-center shadow-sm shadow-slate-400/30 transition hover:border-slate-400 hover:bg-slate-300/60 dark:border-white/10 dark:bg-slate-900 dark:shadow-none dark:hover:border-white/25 dark:hover:bg-slate-900"
             onClick={() => handleSelect(id)}
           >
-            <div className="flex h-[140px] items-center justify-center bg-slate-100/80 p-4 dark:bg-slate-900">
+            <div className="flex h-[140px] items-center justify-center bg-slate-300/45 p-4 dark:bg-slate-900">
               <Icon />
             </div>
-            <div className="border-t border-slate-200 py-5 dark:border-white/10">
+            <div className="border-t border-slate-300/80 py-5 dark:border-white/10">
               <span className="text-base font-semibold text-slate-900 dark:text-slate-100">{label}</span>
             </div>
           </button>

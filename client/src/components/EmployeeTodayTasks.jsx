@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
 const shellClass =
-  'relative overflow-hidden rounded-3xl border border-slate-200/90 bg-gradient-to-b from-stone-50 via-slate-50 to-slate-100 shadow-xl shadow-slate-300/40 ring-1 ring-slate-200/70 dark:border-slate-700/50 dark:from-slate-800/90 dark:via-slate-900/95 dark:to-slate-950 dark:shadow-black/50 dark:ring-white/[0.06]';
+  'relative overflow-hidden rounded-3xl border border-slate-300/80 bg-gradient-to-b from-slate-200/80 via-slate-100 to-slate-300/60 shadow-xl shadow-slate-400/30 ring-1 ring-slate-300/60 dark:border-slate-700/50 dark:from-slate-800/90 dark:via-slate-900/95 dark:to-slate-950 dark:shadow-black/50 dark:ring-white/[0.06]';
 
 function formatWorkDateLabel(ymd) {
   if (!ymd) return '';
@@ -247,18 +247,18 @@ export default function EmployeeTodayTasks() {
       <div className={`${shellClass} flex flex-col`}>
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-sky-500/30 to-transparent" />
 
-        <div className="border-b border-slate-700/50 bg-slate-900/30 px-6 py-5 sm:px-10">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Today’s tasks</p>
-          <p className="mt-2 text-lg font-semibold tracking-tight text-slate-50">What you’re working on</p>
-          <p className="mt-1 text-xs text-slate-500">
-            Work day <span className="font-medium text-slate-300">{formatWorkDateLabel(workDate)}</span> — write in the
+        <div className="border-b border-slate-300/80 bg-slate-300/30 px-6 py-5 dark:border-slate-700/50 dark:bg-slate-900/30 sm:px-10">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-600 dark:text-slate-500">Today’s tasks</p>
+          <p className="mt-2 text-lg font-semibold tracking-tight text-slate-900 dark:text-slate-50">What you’re working on</p>
+          <p className="mt-1 text-xs text-slate-600 dark:text-slate-500">
+            Work day <span className="font-medium text-slate-800 dark:text-slate-300">{formatWorkDateLabel(workDate)}</span> — write in the
             box above, then save. The box clears after save; your saved plan is shown below and sent to your employer on
             team attendance.
           </p>
         </div>
 
         <div className="px-6 py-6 sm:px-10">
-          <h2 className="mb-3 text-base font-semibold tracking-tight text-slate-100">Today&apos;s Plan:</h2>
+          <h2 className="mb-3 text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">Today&apos;s Plan:</h2>
 
           <label htmlFor="today-plan" className="sr-only">
             Today&apos;s plan
@@ -282,7 +282,7 @@ export default function EmployeeTodayTasks() {
             }}
             placeholder="Write your plan for today…"
             rows={5}
-            className="min-h-[120px] w-full resize-y rounded-xl border border-slate-600/80 bg-slate-950/80 px-4 py-3 text-sm leading-relaxed text-slate-100 placeholder:text-slate-600 focus:border-sky-500/50 focus:outline-none focus:ring-2 focus:ring-sky-500/25"
+            className="min-h-[120px] w-full resize-y rounded-xl border border-slate-400/70 bg-slate-200/50 px-4 py-3 text-sm leading-relaxed text-slate-900 placeholder:text-slate-600 focus:border-sky-500/50 focus:outline-none focus:ring-2 focus:ring-sky-500/25 dark:border-slate-600/80 dark:bg-slate-950/80 dark:text-slate-100 dark:placeholder:text-slate-600"
             spellCheck
           />
 
@@ -300,7 +300,7 @@ export default function EmployeeTodayTasks() {
               onClick={() => void polishWithAi()}
               disabled={saving || polishing || !content.trim()}
               title="Improve grammar and professional tone (uses AI)"
-              className="inline-flex items-center justify-center rounded-xl border border-violet-400/70 bg-violet-100 px-5 py-2.5 text-sm font-semibold text-violet-900 transition hover:bg-violet-200 focus:outline-none focus:ring-2 focus:ring-violet-500/35 disabled:cursor-not-allowed disabled:opacity-50 dark:border-violet-500/50 dark:bg-violet-950/40 dark:text-violet-200 dark:hover:bg-violet-900/50"
+              className="inline-flex items-center justify-center rounded-xl border border-violet-400/60 bg-violet-100/90 px-5 py-2.5 text-sm font-semibold text-violet-900 transition hover:bg-violet-200/90 focus:outline-none focus:ring-2 focus:ring-violet-500/35 disabled:cursor-not-allowed disabled:opacity-50 dark:border-violet-500/50 dark:bg-violet-950/40 dark:text-violet-200 dark:hover:bg-violet-900/50"
             >
               {polishing ? 'Polishing…' : 'Polish with AI'}
             </button>
@@ -327,7 +327,7 @@ export default function EmployeeTodayTasks() {
           </div>
 
           {lastSaved.trim().length > 0 && (
-            <div ref={savedPreviewRef} className="mt-6 border-t border-slate-700/60 pt-6">
+            <div ref={savedPreviewRef} className="mt-6 border-t border-slate-300/80 pt-6 dark:border-slate-700/60">
               <div className="flex flex-wrap items-center gap-2 gap-y-1">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Saved plan</p>
                 <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-300/95">
@@ -337,19 +337,19 @@ export default function EmployeeTodayTasks() {
               <p className="mt-2 text-xs leading-relaxed text-slate-600">
                 The draft box above is cleared after you save. This is the copy your employer sees for today.
               </p>
-              <div className="mt-3 rounded-2xl border border-slate-600/50 bg-slate-950/60 px-4 py-4 text-sm leading-relaxed text-slate-200 shadow-inner shadow-black/20">
+              <div className="mt-3 rounded-2xl border border-slate-400/60 bg-slate-200/50 px-4 py-4 text-sm leading-relaxed text-slate-800 shadow-inner shadow-slate-400/20 dark:border-slate-600/50 dark:bg-slate-950/60 dark:text-slate-200 dark:shadow-black/20">
                 <p className="whitespace-pre-wrap wrap-break-word">{lastSaved}</p>
               </div>
             </div>
           )}
 
-          <div className="mt-6 flex flex-wrap items-center gap-2 border-t border-slate-700/60 pt-6">
+          <div className="mt-6 flex flex-wrap items-center gap-2 border-t border-slate-300/80 pt-6 dark:border-slate-700/60">
             <button
               type="button"
               disabled={!canEditSaved}
               onClick={editSavedIntoDraft}
               title={canEditSaved ? 'Load saved plan into the box above' : 'Save something first'}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-600 bg-slate-800/80 px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-slate-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-400/70 bg-slate-300/70 px-4 py-2 text-sm font-medium text-slate-800 transition hover:bg-slate-400/55 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white"
             >
               <IconPencil />
               Edit
@@ -358,7 +358,7 @@ export default function EmployeeTodayTasks() {
               type="button"
               disabled={!canDelete}
               onClick={deleteOrDiscard}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-600 bg-slate-800/80 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-red-900/50 hover:bg-red-950/40 hover:text-red-200 disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-400/70 bg-slate-300/70 px-4 py-2 text-sm font-medium text-slate-800 transition hover:border-red-400/60 hover:bg-red-100/80 hover:text-red-900 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:border-red-900/50 dark:hover:bg-red-950/40 dark:hover:text-red-200"
             >
               <IconTrash />
               {lastSaved.trim() ? 'Delete' : 'Clear draft'}

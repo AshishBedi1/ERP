@@ -106,7 +106,7 @@ export default function AppShell({ children, title }) {
   const headerSubtitle = title && user?.companyName?.trim() ? user.companyName : null;
 
   return (
-    <div className="flex h-dvh min-h-0 overflow-hidden bg-stone-100 dark:bg-slate-900">
+    <div className="flex h-dvh min-h-0 overflow-hidden bg-slate-100 dark:bg-slate-900">
       {mobileNavOpen && (
         <button
           type="button"
@@ -117,7 +117,7 @@ export default function AppShell({ children, title }) {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex h-full min-h-0 w-[min(18rem,88vw)] shrink-0 flex-col overflow-y-auto overscroll-contain border-r border-slate-200 bg-slate-100 text-slate-900 shadow-2xl transition-transform duration-200 ease-out dark:border-slate-800 dark:bg-slate-900 dark:text-white md:static md:z-auto md:w-64 md:max-w-none md:translate-x-0 md:shadow-none ${
+        className={`fixed inset-y-0 left-0 z-50 flex h-full min-h-0 w-[min(18rem,88vw)] shrink-0 flex-col overflow-y-auto overscroll-contain border-r border-slate-300/90 bg-slate-200/90 text-slate-900 shadow-2xl transition-transform duration-200 ease-out dark:border-slate-800 dark:bg-slate-900 dark:text-white md:static md:z-auto md:w-64 md:max-w-none md:translate-x-0 md:shadow-none ${
           mobileNavOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
@@ -132,7 +132,7 @@ export default function AppShell({ children, title }) {
           </Link>
           <button
             type="button"
-            className="shrink-0 rounded-lg border border-slate-300 bg-white/90 p-2 text-slate-600 md:hidden dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-300"
+            className="shrink-0 rounded-lg border border-slate-400/80 bg-slate-300/80 p-2 text-slate-700 md:hidden dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-300"
             onClick={() => setMobileNavOpen(false)}
             aria-label="Close menu"
           >
@@ -151,6 +151,16 @@ export default function AppShell({ children, title }) {
               <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5a2.25 2.25 0 002.25-2.25m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5a2.25 2.25 0 012.25 2.25v7.5" />
             </svg>
             Holidays
+          </NavLink>
+          <NavLink to="/notes" className={navClass}>
+            <svg className="h-5 w-5 shrink-0 opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+              />
+            </svg>
+            Important notes
           </NavLink>
           {isEmployee && (
             <>
@@ -296,11 +306,11 @@ export default function AppShell({ children, title }) {
         </div>
       </aside>
 
-      <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-stone-100 dark:bg-slate-900">
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-slate-200 bg-stone-50/95 px-3 pt-[max(0px,env(safe-area-inset-top))] backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900 sm:gap-3 sm:px-4 md:h-16 md:px-6">
+      <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-slate-100 dark:bg-slate-900">
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-slate-300/80 bg-slate-200/85 px-3 pt-[max(0px,env(safe-area-inset-top))] backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900 sm:gap-3 sm:px-4 md:h-16 md:px-6">
           <button
             type="button"
-            className="inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white p-2 text-slate-700 transition hover:bg-slate-200/80 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 md:hidden"
+            className="inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-400/70 bg-slate-300/70 p-2 text-slate-800 transition hover:bg-slate-400/50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 md:hidden"
             onClick={() => setMobileNavOpen(true)}
             aria-expanded={mobileNavOpen}
             aria-controls="app-sidebar-nav"
@@ -337,7 +347,7 @@ export default function AppShell({ children, title }) {
                   `relative inline-flex items-center justify-center rounded-lg border px-2.5 py-1.5 text-xs font-medium transition sm:px-3 ${
                     isActive
                       ? 'border-blue-500 bg-blue-600 text-white'
-                      : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
+                      : 'border-slate-400/70 bg-slate-300/70 text-slate-800 hover:bg-slate-400/55 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
                   }`
                 }
                 title="Notifications"
@@ -360,14 +370,14 @@ export default function AppShell({ children, title }) {
             <button
               type="button"
               onClick={logout}
-              className="rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-200/80 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 sm:px-3"
+              className="rounded-lg border border-slate-400/70 bg-slate-300/70 px-2.5 py-1.5 text-xs font-medium text-slate-800 transition hover:bg-slate-400/55 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 sm:px-3"
             >
               Sign out
             </button>
           </div>
         </header>
 
-        <main className="flex min-h-0 flex-1 flex-col overflow-hidden bg-stone-100 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 dark:bg-slate-900 sm:px-6 sm:pb-8 sm:pt-6 md:px-8 md:pb-8 md:pt-8">
+        <main className="flex min-h-0 flex-1 flex-col overflow-hidden bg-slate-100 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 dark:bg-slate-900 sm:px-6 sm:pb-8 sm:pt-6 md:px-8 md:pb-8 md:pt-8">
           {title && (
             <h1 className="mb-4 hidden shrink-0 text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 md:mb-6 md:block">
               {title}

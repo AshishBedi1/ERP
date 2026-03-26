@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import AttendanceCalendarModal from './AttendanceCalendarModal';
 
 const shellClass =
-  'relative overflow-hidden rounded-3xl border border-slate-200/90 bg-gradient-to-b from-stone-50 via-slate-50 to-slate-100 shadow-xl shadow-slate-300/40 ring-1 ring-slate-200/70 dark:border-slate-700/50 dark:from-slate-800/90 dark:via-slate-900/95 dark:to-slate-950 dark:shadow-black/50 dark:ring-white/[0.06]';
+  'relative overflow-hidden rounded-3xl border border-slate-300/80 bg-gradient-to-b from-slate-200/80 via-slate-100 to-slate-300/60 shadow-xl shadow-slate-400/30 ring-1 ring-slate-300/60 dark:border-slate-700/50 dark:from-slate-800/90 dark:via-slate-900/95 dark:to-slate-950 dark:shadow-black/50 dark:ring-white/[0.06]';
 
 function formatClock(iso) {
   if (!iso) return '';

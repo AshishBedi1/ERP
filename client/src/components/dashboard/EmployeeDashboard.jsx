@@ -174,7 +174,7 @@ export default function EmployeeDashboard() {
             </div>
             <Link
               to="/leave"
-              className="shrink-0 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-sm hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800"
+              className="shrink-0 rounded-lg border border-slate-400/70 bg-slate-300/70 px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-sm hover:bg-slate-400/55 dark:border-slate-600 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800"
             >
               Leave
             </Link>
@@ -195,7 +195,7 @@ export default function EmployeeDashboard() {
             </div>
             <Link
               to="/tasks"
-              className="shrink-0 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-sm hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800"
+              className="shrink-0 rounded-lg border border-slate-400/70 bg-slate-300/70 px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-sm hover:bg-slate-400/55 dark:border-slate-600 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800"
             >
               Edit
             </Link>

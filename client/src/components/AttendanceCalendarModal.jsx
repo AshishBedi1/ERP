@@ -173,8 +173,8 @@ export default function AttendanceCalendarModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="max-h-[min(90dvh,900px)] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-200/90 bg-stone-50 shadow-2xl dark:border-slate-600/60 dark:bg-slate-900">
-        <div className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-slate-200/90 bg-stone-50/95 px-5 py-4 backdrop-blur dark:border-slate-700/60 dark:bg-slate-900/95">
+      <div className="max-h-[min(90dvh,900px)] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-300/80 bg-slate-200/90 shadow-2xl dark:border-slate-600/60 dark:bg-slate-900">
+        <div className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-slate-300/80 bg-slate-200/90 px-5 py-4 backdrop-blur dark:border-slate-700/60 dark:bg-slate-900/95">
           <div>
             <h2 id="att-cal-title" className="text-lg font-semibold text-slate-900 dark:text-slate-100">
               {employeeName ? (
@@ -193,7 +193,7 @@ export default function AttendanceCalendarModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-sm text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-700"
+            className="rounded-lg border border-slate-400/70 bg-slate-300/70 px-2.5 py-1 text-sm text-slate-800 transition hover:bg-slate-400/55 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-700"
             aria-label="Close"
           >
             ✕
@@ -206,7 +206,7 @@ export default function AttendanceCalendarModal({
               <button
                 type="button"
                 onClick={goPrev}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-800 shadow-sm hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                className="rounded-lg border border-slate-400/70 bg-slate-300/70 px-3 py-1.5 text-sm text-slate-800 shadow-sm hover:bg-slate-400/55 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                 aria-label="Previous month"
               >
                 ←
@@ -215,7 +215,7 @@ export default function AttendanceCalendarModal({
               <button
                 type="button"
                 onClick={goNext}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-800 shadow-sm hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                className="rounded-lg border border-slate-400/70 bg-slate-300/70 px-3 py-1.5 text-sm text-slate-800 shadow-sm hover:bg-slate-400/55 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                 aria-label="Next month"
               >
                 →

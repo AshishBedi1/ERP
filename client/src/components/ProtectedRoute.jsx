@@ -11,7 +11,7 @@ export function ProtectedRoute({ children, roles }) {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-stone-100 dark:bg-slate-900">
+      <div className="flex min-h-screen items-center justify-center bg-slate-100 dark:bg-slate-900">
         <span className="text-slate-500 dark:text-slate-400">Loading...</span>
       </div>
     );

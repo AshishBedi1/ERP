@@ -167,7 +167,7 @@ export default function EmployerTeam() {
                     <button
                       type="button"
                       onClick={() => openEdit(emp)}
-                      className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 shadow-sm transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:bg-slate-700"
+                      className="rounded-lg border border-slate-400/70 bg-slate-300/70 px-3 py-1.5 text-xs font-medium text-slate-800 shadow-sm transition hover:bg-slate-400/55 dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:bg-slate-700"
                     >
                       Edit
                     </button>
@@ -194,7 +194,7 @@ export default function EmployerTeam() {
           aria-modal="true"
           aria-labelledby="edit-employee-title"
         >
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-stone-50 p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+          <div className="w-full max-w-md rounded-2xl border border-slate-300/80 bg-slate-200/90 p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900">
             <h2 id="edit-employee-title" className="text-lg font-semibold text-slate-900 dark:text-slate-100">
               Edit employee
             </h2>
@@ -261,7 +261,7 @@ export default function EmployerTeam() {
                 <button
                   type="button"
                   onClick={closeEdit}
-                  className="flex-1 rounded-xl border border-slate-300 bg-white py-2.5 text-sm font-medium text-slate-800 transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                  className="flex-1 rounded-xl border border-slate-400/70 bg-slate-300/70 py-2.5 text-sm font-medium text-slate-800 transition hover:bg-slate-400/55 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                 >
                   Cancel
                 </button>
@@ -296,7 +296,7 @@ export default function EmployerTeam() {
           onClick={closeDeleteConfirm}
         >
           <div
-            className="w-full max-w-md rounded-2xl border border-slate-200 bg-stone-50 p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+            className="w-full max-w-md rounded-2xl border border-slate-300/80 bg-slate-200/90 p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 id="delete-employee-title" className="text-lg font-semibold text-slate-900 dark:text-slate-100">
@@ -320,7 +320,7 @@ export default function EmployerTeam() {
                 type="button"
                 disabled={deleteBusyId === deleting._id}
                 onClick={closeDeleteConfirm}
-                className="rounded-xl border border-slate-300 bg-white py-2.5 text-sm font-medium text-slate-800 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 sm:min-w-28"
+                className="rounded-xl border border-slate-400/70 bg-slate-300/70 py-2.5 text-sm font-medium text-slate-800 transition hover:bg-slate-400/55 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 sm:min-w-28"
               >
                 Cancel
               </button>

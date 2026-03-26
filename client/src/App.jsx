@@ -14,6 +14,7 @@ import Holidays from './pages/Holidays';
 import Attendance from './pages/Attendance';
 import Leave from './pages/Leave';
 import Notifications from './pages/Notifications';
+import Notes from './pages/Notes';
 import Tasks from './pages/Tasks';
 
 function App() {
@@ -35,6 +36,14 @@ function App() {
         element={
           <ProtectedRoute>
             <Holidays />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notes"
+        element={
+          <ProtectedRoute roles={['employee', 'employer']}>
+            <Notes />
           </ProtectedRoute>
         }
       />

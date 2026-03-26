@@ -11,6 +11,7 @@ const leaveRoutes = require('./routes/leaveRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const noteRoutes = require('./routes/noteRoutes');
 
 connectDB();
 
@@ -28,6 +29,7 @@ app.use('/api/leave', leaveRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/notes', noteRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ success: true, message: 'ERP API running' }));

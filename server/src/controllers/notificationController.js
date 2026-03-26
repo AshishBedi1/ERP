@@ -1,5 +1,6 @@
 const Notification = require('../models/Notification');
 const LeaveRequest = require('../models/LeaveRequest');
+const { ensureHolidayEveNotificationsForUser } = require('../services/holidayEveNotifications');
 
 function canUseNotifications(user) {
   return user && (user.role === 'employee' || user.role === 'employer');
@@ -15,6 +16,7 @@ function mapNotification(n, leaveStatusById) {
     read: n.read,
     attendanceId: n.attendanceId,
     leaveRequestId: n.leaveRequestId || null,
+    holidayId: n.holidayId || null,
     leaveStatus: lid ? leaveStatusById.get(lid) ?? null : null,
     createdAt: n.createdAt,
   };
@@ -26,6 +28,12 @@ exports.list = async (req, res) => {
   try {
     if (!canUseNotifications(req.user)) {
       return res.status(403).json({ success: false, message: 'Not authorized.' });
+    }
+
+    try {
+      await ensureHolidayEveNotificationsForUser(req.user);
+    } catch (e) {
+      console.error('holiday eve notifications:', e);
     }
 
     const notifications = await Notification.find({ userId: req.user.id })
@@ -58,6 +66,12 @@ exports.unreadCount = async (req, res) => {
   try {
     if (!canUseNotifications(req.user)) {
       return res.status(403).json({ success: false, message: 'Not authorized.' });
+    }
+
+    try {
+      await ensureHolidayEveNotificationsForUser(req.user);
+    } catch (e) {
+      console.error('holiday eve notifications:', e);
     }
 
     const count = await Notification.countDocuments({ userId: req.user.id, read: false });
@@ -104,6 +118,26 @@ exports.markAllRead = async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     console.error('notifications markAllRead error:', error);
+    res.status(500).json({ success: false, message: 'Server error.' });
+  }
+};
+
+// @route   DELETE /api/notifications/:id
+// @access  Private (employee + employer)
+exports.destroy = async (req, res) => {
+  try {
+    if (!canUseNotifications(req.user)) {
+      return res.status(403).json({ success: false, message: 'Not authorized.' });
+    }
+
+    const doc = await Notification.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+    if (!doc) {
+      return res.status(404).json({ success: false, message: 'Notification not found.' });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('notifications destroy error:', error);
     res.status(500).json({ success: false, message: 'Server error.' });
   }
 };

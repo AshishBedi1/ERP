@@ -17,7 +17,13 @@ connectDB();
 
 const app = express();
 
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173', credentials: true }));
+const defaultClientOrigin = 'https://erp-client-p5tx.vercel.app';
+const allowedOrigins = [
+  'http://localhost:5173',
+  defaultClientOrigin,
+  ...(process.env.CLIENT_URL ? [process.env.CLIENT_URL.replace(/\/$/, '')] : []),
+];
+app.use(cors({ origin: [...new Set(allowedOrigins)], credentials: true }));
 app.use(express.json());
 
 // Routes

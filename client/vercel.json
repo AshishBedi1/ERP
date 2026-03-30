@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://erp-auth.onrender.com/api/:path*"
+      "destination": "https://erp-dbic.onrender.com/api/:path*"
     }
   ]
 }

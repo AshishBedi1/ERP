@@ -8,6 +8,7 @@
     "client"
   ],
   "scripts": {
+    "start": "npm run server",
     "install:all": "npm install && cd server && npm install && cd ../client && npm install",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "cd server && npm run dev",

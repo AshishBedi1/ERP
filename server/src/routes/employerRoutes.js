@@ -3,6 +3,7 @@ const { protect, authorize } = require('../middleware/auth');
 const { validate } = require('../middleware/validate');
 const employerController = require('../controllers/employerController');
 const attendanceController = require('../controllers/attendanceController');
+const taskController = require('../controllers/taskController');
 const leaveController = require('../controllers/leaveController');
 const { body } = require('express-validator');
 
@@ -15,6 +16,8 @@ router.get('/public/:employerId', employerController.getEmployerPublic);
 router.use(protect, authorize('employer'));
 
 router.patch('/attendance/:id', attendanceController.updateByEmployer);
+
+router.get('/tasks/history', taskController.getEmployerTeamTaskHistory);
 
 router.get('/leave-requests', leaveController.listForEmployer);
 router.patch('/leave-requests/:id', leaveController.decideLeaveRequest);

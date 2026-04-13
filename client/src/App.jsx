@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 import RoleSelect from './pages/RoleSelect';
@@ -16,6 +16,12 @@ import Leave from './pages/Leave';
 import Notifications from './pages/Notifications';
 import Notes from './pages/Notes';
 import Tasks from './pages/Tasks';
+import Inbox from './pages/Inbox';
+
+function RedirectEmployerChat() {
+  const { employeeId } = useParams();
+  return <Navigate to={employeeId ? `/inbox?with=${employeeId}` : '/inbox'} replace />;
+}
 
 function App() {
   return (
@@ -76,6 +82,38 @@ function App() {
         element={
           <ProtectedRoute roles={['employee', 'employer']}>
             <Notifications />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/inbox"
+        element={
+          <ProtectedRoute roles={['employee', 'employer']}>
+            <Inbox />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/chat"
+        element={
+          <ProtectedRoute roles={['employee']}>
+            <Navigate to="/inbox" replace />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employer/chat"
+        element={
+          <ProtectedRoute roles={['employer']}>
+            <Navigate to="/inbox" replace />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employer/chat/:employeeId"
+        element={
+          <ProtectedRoute roles={['employer']}>
+            <RedirectEmployerChat />
           </ProtectedRoute>
         }
       />

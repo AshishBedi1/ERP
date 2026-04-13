@@ -35,12 +35,13 @@ function MenuIcon({ open }) {
   );
 }
 
-export default function AppShell({ children, title }) {
+export default function AppShell({ children, title, scrollableContent = true, flush = false }) {
   const { user, logout, isEmployer, isEmployee } = useAuth();
   const location = useLocation();
   const roleLabel = isEmployer ? 'Employer' : 'Employee';
   const [team, setTeam] = useState([]);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [unreadChat, setUnreadChat] = useState(0);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const loadUnreadNotifications = useCallback(() => {
@@ -52,6 +53,17 @@ export default function AppShell({ children, title }) {
       .get('/api/notifications/unread-count')
       .then(({ data }) => setUnreadNotifications(data.count ?? 0))
       .catch(() => setUnreadNotifications(0));
+  }, [isEmployee, isEmployer]);
+
+  const loadUnreadChat = useCallback(() => {
+    if (!isEmployee && !isEmployer) {
+      setUnreadChat(0);
+      return;
+    }
+    axios
+      .get('/api/chat/unread-count')
+      .then(({ data }) => setUnreadChat(data.count ?? 0))
+      .catch(() => setUnreadChat(0));
   }, [isEmployee, isEmployer]);
 
   useEffect(() => {
@@ -72,17 +84,27 @@ export default function AppShell({ children, title }) {
 
   useEffect(() => {
     loadUnreadNotifications();
-    const t = setInterval(loadUnreadNotifications, 45000);
-    const onFocus = () => loadUnreadNotifications();
+    loadUnreadChat();
+    const t = setInterval(() => {
+      loadUnreadNotifications();
+      loadUnreadChat();
+    }, 45000);
+    const onFocus = () => {
+      loadUnreadNotifications();
+      loadUnreadChat();
+    };
     const onUpdated = () => loadUnreadNotifications();
+    const onChatUpdated = () => loadUnreadChat();
     window.addEventListener('focus', onFocus);
     window.addEventListener('notifications-updated', onUpdated);
+    window.addEventListener('chat-updated', onChatUpdated);
     return () => {
       clearInterval(t);
       window.removeEventListener('focus', onFocus);
       window.removeEventListener('notifications-updated', onUpdated);
+      window.removeEventListener('chat-updated', onChatUpdated);
     };
-  }, [loadUnreadNotifications]);
+  }, [loadUnreadNotifications, loadUnreadChat]);
 
   useEffect(() => {
     setMobileNavOpen(false);
@@ -194,6 +216,23 @@ export default function AppShell({ children, title }) {
                 </svg>
                 Leave
               </NavLink>
+              <NavLink to="/inbox" className={navClass}>
+                <span className="relative inline-flex">
+                  <svg className="h-5 w-5 shrink-0 opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.563-.337L5.454 21l1.813-4.036A8.959 8.959 0 015.25 12c0-4.97 4.03-9 9-9s9 4.03 9 9z"
+                    />
+                  </svg>
+                  {unreadChat > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-500 px-1 text-[10px] font-bold text-slate-900 tabular-nums">
+                      {unreadChat > 9 ? '9+' : unreadChat}
+                    </span>
+                  )}
+                </span>
+                Inbox
+              </NavLink>
               <NavLink to="/notifications" className={navClass}>
                 <span className="relative inline-flex">
                   <svg className="h-5 w-5 shrink-0 opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -244,6 +283,23 @@ export default function AppShell({ children, title }) {
                   />
                 </svg>
                 Leave requests
+              </NavLink>
+              <NavLink to="/inbox" className={navClass}>
+                <span className="relative inline-flex">
+                  <svg className="h-5 w-5 shrink-0 opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.563-.337L5.454 21l1.813-4.036A8.959 8.959 0 015.25 12c0-4.97 4.03-9 9-9s9 4.03 9 9z"
+                    />
+                  </svg>
+                  {unreadChat > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-500 px-1 text-[10px] font-bold text-slate-900 tabular-nums">
+                      {unreadChat > 9 ? '9+' : unreadChat}
+                    </span>
+                  )}
+                </span>
+                Inbox
               </NavLink>
               <NavLink to="/notifications" className={navClass}>
                 <span className="relative inline-flex">
@@ -339,32 +395,58 @@ export default function AppShell({ children, title }) {
             )}
           </div>
           <div className="hidden min-w-0 flex-1 md:block" aria-hidden />
-          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             {(isEmployee || isEmployer) && (
-              <NavLink
-                to="/notifications"
-                className={({ isActive }) =>
-                  `relative inline-flex items-center justify-center rounded-lg border px-2.5 py-1.5 text-xs font-medium transition sm:px-3 ${
-                    isActive
-                      ? 'border-blue-500 bg-blue-600 text-white'
-                      : 'border-slate-400/70 bg-slate-300/70 text-slate-800 hover:bg-slate-400/55 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
-                  }`
-                }
-                title="Notifications"
-              >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                  />
-                </svg>
-                {unreadNotifications > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-bold text-slate-900 tabular-nums">
-                    {unreadNotifications > 9 ? '9+' : unreadNotifications}
-                  </span>
-                )}
-              </NavLink>
+              <>
+                <NavLink
+                  to="/inbox"
+                  className={({ isActive }) =>
+                    `relative inline-flex items-center justify-center rounded-l-lg rounded-r-none border border-r-0 px-2.5 py-1.5 text-xs font-medium transition sm:px-3 ${
+                      isActive
+                        ? 'border-blue-500 bg-blue-600 text-white'
+                        : 'border-slate-400/70 bg-slate-300/70 text-slate-800 hover:bg-slate-400/55 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
+                    }`
+                  }
+                  title="Inbox"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.563-.337L5.454 21l1.813-4.036A8.959 8.959 0 015.25 12c0-4.97 4.03-9 9-9s9 4.03 9 9z"
+                    />
+                  </svg>
+                  {unreadChat > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-emerald-500 px-1 text-[10px] font-bold text-slate-900 tabular-nums">
+                      {unreadChat > 9 ? '9+' : unreadChat}
+                    </span>
+                  )}
+                </NavLink>
+                <NavLink
+                  to="/notifications"
+                  className={({ isActive }) =>
+                    `relative inline-flex items-center justify-center rounded-l-none rounded-r-lg border px-2.5 py-1.5 text-xs font-medium transition sm:px-3 ${
+                      isActive
+                        ? 'border-blue-500 bg-blue-600 text-white'
+                        : 'border-slate-400/70 bg-slate-300/70 text-slate-800 hover:bg-slate-400/55 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
+                    }`
+                  }
+                  title="Notifications"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                    />
+                  </svg>
+                  {unreadNotifications > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-bold text-slate-900 tabular-nums">
+                      {unreadNotifications > 9 ? '9+' : unreadNotifications}
+                    </span>
+                  )}
+                </NavLink>
+              </>
             )}
             <ThemeToggle />
             <button
@@ -377,13 +459,27 @@ export default function AppShell({ children, title }) {
           </div>
         </header>
 
-        <main className="flex min-h-0 flex-1 flex-col overflow-hidden bg-slate-100 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 dark:bg-slate-900 sm:px-6 sm:pb-8 sm:pt-6 md:px-8 md:pb-8 md:pt-8">
-          {title && (
+        <main
+          className={`flex min-h-0 flex-1 flex-col overflow-hidden bg-slate-100 dark:bg-slate-900 ${
+            flush
+              ? 'p-0'
+              : 'px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 sm:px-6 sm:pb-8 sm:pt-6 md:px-8 md:pb-8 md:pt-8'
+          }`}
+        >
+          {title && !flush && (
             <h1 className="mb-4 hidden shrink-0 text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 md:mb-6 md:block">
               {title}
             </h1>
           )}
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">{children}</div>
+          <div
+            className={
+              scrollableContent
+                ? 'min-h-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]'
+                : `flex min-h-0 flex-1 flex-col overflow-hidden ${flush ? 'min-h-0 h-full' : ''}`
+            }
+          >
+            {children}
+          </div>
         </main>
       </div>
     </div>

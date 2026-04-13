@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import AppShell, { EMPLOYER_TEAM_REFRESH } from '../components/AppShell';
 import AttendanceCalendarModal from '../components/AttendanceCalendarModal';
@@ -163,7 +164,13 @@ export default function EmployerTeam() {
                     </button>
                     <p className="truncate text-sm text-slate-600 dark:text-slate-400">{emp.email}</p>
                   </div>
-                  <div className="flex shrink-0 items-center gap-2">
+                  <div className="flex shrink-0 flex-wrap items-center gap-2">
+                    <Link
+                      to={`/inbox?with=${emp._id}`}
+                      className="rounded-lg border border-blue-500/50 bg-blue-600/90 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition hover:bg-blue-500"
+                    >
+                      Message
+                    </Link>
                     <button
                       type="button"
                       onClick={() => openEdit(emp)}

@@ -2,6 +2,7 @@ import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { EmployerIllustration, EmployeeIllustration } from '../components/RoleIllustrations';
 import ThemeToggle from '../components/ThemeToggle';
+import ErpLogo from '../components/ErpLogo';
 
 const ROLES = [
   { id: 'employer', label: 'Employer', Icon: EmployerIllustration },
@@ -21,7 +22,9 @@ export default function RoleSelect() {
   return (
     <div className="erp-page-auth relative flex min-h-screen w-full flex-col items-center justify-center px-4 py-12">
       <div className="absolute left-6 top-6 flex w-[calc(100%-3rem)] items-start justify-between">
-        <span className="text-lg font-bold tracking-tight text-slate-800 dark:text-slate-200">ERP</span>
+        <Link to="/" className="inline-flex shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 rounded-lg" aria-label="Home">
+          <ErpLogo className="h-8 w-8 shrink-0 rounded-md" />
+        </Link>
         <ThemeToggle />
       </div>
       <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Sign in</h1>

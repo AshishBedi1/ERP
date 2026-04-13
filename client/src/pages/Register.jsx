@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import ThemeToggle from '../components/ThemeToggle';
+import ErpLogo from '../components/ErpLogo';
 
 export default function Register() {
   const [searchParams] = useSearchParams();
@@ -75,7 +76,13 @@ export default function Register() {
   return (
     <div className="erp-page-auth relative flex min-h-screen w-full flex-col items-center justify-center px-4 py-8 sm:p-8">
       <div className="absolute left-4 top-4 flex w-[calc(100%-2rem)] items-start justify-between sm:left-6 sm:top-6 sm:w-[calc(100%-3rem)]">
-        <span className="text-lg font-bold tracking-tight text-slate-800 dark:text-slate-200">ERP</span>
+        <Link
+          to="/"
+          className="inline-flex shrink-0 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60"
+          aria-label="Home"
+        >
+          <ErpLogo className="h-8 w-8 shrink-0 rounded-md" />
+        </Link>
         <ThemeToggle />
       </div>
       <div className="erp-panel-auth w-full max-w-[440px] shrink-0 p-6 sm:p-10">

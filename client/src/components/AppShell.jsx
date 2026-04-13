@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import ThemeToggle from './ThemeToggle';
+import ErpLogo from './ErpLogo';
 
 export const EMPLOYER_TEAM_REFRESH = 'employer-team-refresh';
 
@@ -148,9 +149,10 @@ export default function AppShell({ children, title, scrollableContent = true, fl
           <Link
             to="/dashboard"
             onClick={() => setMobileNavOpen(false)}
-            className="line-clamp-2 min-w-0 flex-1 text-left text-base font-bold leading-tight tracking-tight text-slate-900 transition-colors hover:text-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 dark:text-slate-100 dark:hover:text-blue-200 md:text-lg"
+            className="line-clamp-2 flex min-w-0 flex-1 items-center gap-2.5 text-left text-base font-bold leading-tight tracking-tight text-slate-900 transition-colors hover:text-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 dark:text-white dark:hover:text-blue-200 md:text-lg"
           >
-            {user?.companyName?.trim() || 'Company'}
+            <ErpLogo />
+            <span className="min-w-0 antialiased text-shadow-none">{user?.companyName?.trim() || 'Company'}</span>
           </Link>
           <button
             type="button"
@@ -378,12 +380,14 @@ export default function AppShell({ children, title, scrollableContent = true, fl
             {!title && user?.companyName?.trim() ? (
               <Link
                 to="/dashboard"
-                className="block truncate text-sm font-semibold leading-tight text-slate-900 transition-colors hover:text-blue-700 dark:text-slate-100 dark:hover:text-blue-200"
+                className="block truncate text-sm font-semibold leading-tight text-slate-900 transition-colors hover:text-blue-700 dark:text-white dark:hover:text-blue-200 antialiased text-shadow-none"
               >
                 {headerTitle}
               </Link>
             ) : (
-              <p className="truncate text-sm font-semibold leading-tight text-slate-900 dark:text-slate-100">{headerTitle}</p>
+              <p className="truncate text-sm font-semibold leading-tight text-slate-900 dark:text-white antialiased text-shadow-none">
+                {headerTitle}
+              </p>
             )}
             {headerSubtitle && (
               <Link

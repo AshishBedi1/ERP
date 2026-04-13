@@ -2,6 +2,10 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
+/** Channel message poll: faster while the tab is visible, slower in the background */
+const CHAT_POLL_VISIBLE_MS = 3500;
+const CHAT_POLL_HIDDEN_MS = 25000;
+
 function formatTime(iso) {
   if (!iso) return '';
   return new Date(iso).toLocaleString(undefined, {
@@ -100,7 +104,8 @@ export default function ChannelThread({ channelId, fillHeight = false }) {
 
   useEffect(() => {
     if (!channelId) return;
-    const t = setInterval(() => {
+
+    const poll = () => {
       axios
         .get(`/api/chat/channels/${channelId}/messages`, { params: { limit: 50 } })
         .then(({ data }) => {
@@ -115,8 +120,26 @@ export default function ChannelThread({ channelId, fillHeight = false }) {
           setHasMore(!!data.hasMore);
         })
         .catch(() => {});
-    }, 12000);
-    return () => clearInterval(t);
+    };
+
+    const intervalMs = () =>
+      document.visibilityState === 'visible' ? CHAT_POLL_VISIBLE_MS : CHAT_POLL_HIDDEN_MS;
+
+    let t = setInterval(poll, intervalMs());
+
+    const onVisibility = () => {
+      clearInterval(t);
+      if (document.visibilityState === 'visible') {
+        poll();
+      }
+      t = setInterval(poll, intervalMs());
+    };
+
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      clearInterval(t);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, [channelId]);
 
   const loadOlder = async () => {

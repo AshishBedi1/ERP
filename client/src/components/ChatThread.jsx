@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
+/** DM message poll: faster while the tab is visible, slower in the background */
+const CHAT_POLL_VISIBLE_MS = 3500;
+const CHAT_POLL_HIDDEN_MS = 25000;
+
 function formatTime(iso) {
   if (!iso) return '';
   return new Date(iso).toLocaleString(undefined, {
@@ -149,7 +153,8 @@ export default function ChatThread({
 
   useEffect(() => {
     if (!withUserId) return;
-    const t = setInterval(() => {
+
+    const poll = () => {
       axios
         .get('/api/chat/messages', { params: { withUserId, limit: 50 } })
         .then(({ data }) => {
@@ -159,8 +164,26 @@ export default function ChatThread({
           markRead();
         })
         .catch(() => {});
-    }, 12000);
-    return () => clearInterval(t);
+    };
+
+    const intervalMs = () =>
+      document.visibilityState === 'visible' ? CHAT_POLL_VISIBLE_MS : CHAT_POLL_HIDDEN_MS;
+
+    let t = setInterval(poll, intervalMs());
+
+    const onVisibility = () => {
+      clearInterval(t);
+      if (document.visibilityState === 'visible') {
+        poll();
+      }
+      t = setInterval(poll, intervalMs());
+    };
+
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      clearInterval(t);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, [withUserId, markRead]);
 
   const loadOlder = async () => {

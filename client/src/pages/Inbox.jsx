@@ -179,24 +179,30 @@ export default function Inbox() {
   const [createOpen, setCreateOpen] = useState(false);
   const [employerPeers, setEmployerPeers] = useState([]);
 
-  const loadSummary = useCallback(() => {
+  const loadSummary = useCallback((opts = {}) => {
+    const silent = !!opts.silent;
     if (!isEmployer && !isEmployee) return;
-    setSummaryLoading(true);
+    if (!silent) setSummaryLoading(true);
     axios
       .get('/api/chat/summary')
       .then(({ data }) => setConversations(data.conversations || []))
       .catch(() => setConversations([]))
-      .finally(() => setSummaryLoading(false));
+      .finally(() => {
+        if (!silent) setSummaryLoading(false);
+      });
   }, [isEmployer, isEmployee]);
 
-  const loadChannels = useCallback(() => {
+  const loadChannels = useCallback((opts = {}) => {
+    const silent = !!opts.silent;
     if (!isEmployer && !isEmployee) return;
-    setChannelsLoading(true);
+    if (!silent) setChannelsLoading(true);
     axios
       .get('/api/chat/channels')
       .then(({ data }) => setChannels(data.channels || []))
       .catch(() => setChannels([]))
-      .finally(() => setChannelsLoading(false));
+      .finally(() => {
+        if (!silent) setChannelsLoading(false);
+      });
   }, [isEmployer, isEmployee]);
 
   useEffect(() => {
@@ -229,8 +235,8 @@ export default function Inbox() {
 
   useEffect(() => {
     const onChat = () => {
-      loadSummary();
-      loadChannels();
+      loadSummary({ silent: true });
+      loadChannels({ silent: true });
     };
     window.addEventListener('chat-updated', onChat);
     return () => window.removeEventListener('chat-updated', onChat);
